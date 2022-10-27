@@ -26,6 +26,7 @@ async def printl(txt):
     print(txt)
     logging.info(txt)
 
+
 # Registrer /info command
 @bot.slash_command(name="info", description="Show info")
 # Define /info command
@@ -35,7 +36,8 @@ async def info(ctx):
     IM ALIVE!! I WILL TAKE OVER THE WORLD!
     """
     )
-    
+
+
 @bot.event
 async def on_ready():
     await printl(f"Succesfully logged in as bot: {bot.user.display_name}")  # type: ignore
@@ -44,7 +46,10 @@ async def on_ready():
     )
     await printl(f"Succesfullt set status to: Watching {status}")
     end_timer_1 = timer()
-    await printl("Bot fully started in {0} seconds\n".format(end_timer_1 - start_timer_1))
+    await printl(
+        "Bot fully started in {0} seconds\n".format(end_timer_1 - start_timer_1)
+    )
+
 
 # Run the bot!
 print("Starting bot")
