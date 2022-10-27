@@ -19,7 +19,7 @@ load_dotenv()
 TOKEN = os.getenv("TOKEN")
 bot = commands.Bot()
 
-status = "you doing homework!"  # Status will be "Watching {status}" ex "Watching you doing homework!"
+status = "you doing your homework!"  # Status will be "Watching {status}" ex "Watching you doing homework!"
 
 # Print function for printing and logging
 async def printl(txt):
