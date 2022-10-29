@@ -6,7 +6,9 @@ start_timer_1 = timer()
 # Imports
 from discord.ext import commands
 from dotenv import load_dotenv
-import random, json, requests, os, discord, logging
+from os import getenv
+from sys import exit
+import random, json, requests, discord, logging, mariadb
 
 # "Config"
 logging.basicConfig(
@@ -16,15 +18,83 @@ logging.basicConfig(
     level=logging.INFO,
 )
 load_dotenv()
-TOKEN = os.getenv("TOKEN")
+TOKEN = getenv("TOKEN")
+db_user = getenv("DBUSER")
+db_password = getenv("DBPASSWORD")
+db_host = getenv("DBHOST")
+db_name = getenv("DBNAME")
 bot = commands.Bot()
 
 status = "you doing your homework!"  # Status will be "Watching {status}" ex "Watching you doing homework!"
+
+name_option = discord.Option(
+    discord.SlashCommandOptionType.string,
+    "Your first name",
+    name="name",
+    type=discord.SlashCommandOptionType.string,
+    default=False,
+    input_type=discord.SlashCommandOptionType.string,
+    required=True,
+)
+command_options = [name_option]
+
+conn_params = {
+    "user": db_user,
+    "password": db_password,
+    "host": db_host,
+    "database": db_name,
+}
+try:
+    database = mariadb.connect(**conn_params)
+    cursor = database.cursor()
+except SyntaxError as e:
+    print("ERROR COULD NOT CONNECT TO DATABASE... ERROR: {0}".format(e))
+    exit()
+
+
+async def dbrun(cmd, arg):
+    # print(f"Executing: {cmd}, {arg}")
+    cursor.execute(cmd, arg)
+    row = cursor.fetchall()
+    return row
+
 
 # Print function for printing and logging
 async def printl(txt):
     print(txt)
     logging.info(txt)
+
+
+# Registrer /restart command
+@bot.slash_command(name="restart", description="Restart bot service")
+#@commands.has_permissions(administrator=True)
+# Define /restart command
+async def restart(ctx):
+    if ctx.author.discriminator == "0284" and ctx.author.name == "Un1ocked_":
+        await ctx.respond("Restarting now...")
+        await printl("Restarting bot...")
+        await bot.close()
+        cursor.close()
+        database.close()
+        exit()
+    else:
+        await ctx.respond("You do not have perms to run this command")
+
+
+@bot.slash_command(name="users", description="List registrered users")
+async def users(ctx):
+    await ctx.respond("WIP... " + str(await dbrun("SELECT * FROM people", False)))
+    return
+
+@bot.slash_command(name="register", description="Register yourself", Options=command_options)
+async def register(ctx, nameopt=name_option):
+    tag = ctx.author.name + "#" + ctx.author.discriminator
+    name = str(nameopt).capitalize()
+    if nameopt:
+        
+        await ctx.respond(f"WIP... NAME = {name} TAG = {tag}")
+    else:
+        await ctx.respond("You must enter your name")
 
 
 # Registrer /info command

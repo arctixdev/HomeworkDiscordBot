@@ -24,7 +24,7 @@ except SyntaxError as e:
 
 
 def dbrun(cmd, arg):
-    print(f"Executing: {cmd}, {arg}")
+    # print(f"Executing: {cmd}, {arg}")
     cursor.execute(cmd, arg)
     row = cursor.fetchall()
     return row
@@ -32,13 +32,13 @@ def dbrun(cmd, arg):
 
 tag = input("Discord tag: ")
 id = dbrun("SELECT id FROM people WHERE tag=?", (tag,))[0][0]
-print(id)
+# print(id)
 rem = dbrun("SELECT homeworkid FROM todo WHERE personid=?", (id,))
-print(rem)
+# print(rem)
 for i in rem:
-    print(i[0])
+    # print(i[0])
     hm = dbrun("SELECT name FROM homework WHERE id=?", (i[0],))
-    print(hm)
+    print(hm[0][0])
 
 cursor.close()
 database.close()
