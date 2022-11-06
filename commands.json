@@ -1,0 +1,8 @@
+{
+    "update": {
+        "description": "Update code and restart"
+
+    }, "restart": {
+        "description": "Restart bot"
+    }
+}

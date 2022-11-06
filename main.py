@@ -105,4 +105,3 @@ async def on_ready():
 print("Starting bot")
 logging.info("Starting bot")
 bot.run(config.token)
-
