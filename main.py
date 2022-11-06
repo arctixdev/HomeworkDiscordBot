@@ -109,7 +109,10 @@ async def register(ctx, nameopt=name_option):
     tag = ctx.author.name + "#" + ctx.author.discriminator
     name = str(nameopt).capitalize()
     if nameopt:
-        
+        users = str(await dbrun("SELECT * FROM people", False)[0])
+        await printl(users)
+        if tag in users:
+            await ctx.respond("You seem to already be registered, if you think this is a error please contact bot creator by running /info")
         await ctx.respond(f"WIP... NAME = {name} TAG = {tag}")
     else:
         await ctx.respond("You must enter your name")
