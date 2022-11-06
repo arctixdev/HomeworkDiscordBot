@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 from os import getenv
 from sys import exit
 import random, json, requests, discord, logging, mariadb
+from subprocess import Popen as srun
 
 # "Config"
 logging.basicConfig(
@@ -65,6 +66,23 @@ async def printl(txt):
     logging.info(txt)
 
 
+# Registrer /update command
+@bot.slash_command(name="update", description="Restart bot service")
+#@commands.has_permissions(administrator=True)
+# Define /update command
+async def update(ctx):
+    if ctx.author.discriminator == "0284" and ctx.author.name == "Un1ocked_":
+        await ctx.respond("Updating and restarting now...")
+        await printl("Updating and restarting bot...")
+        srun(["/usr/bin/git", "pull"])
+        await bot.close()
+        cursor.close()
+        database.close()
+        exit()
+    else:
+        await ctx.respond("You do not have perms to run this command")
+
+
 # Registrer /restart command
 @bot.slash_command(name="restart", description="Restart bot service")
 #@commands.has_permissions(administrator=True)
@@ -106,7 +124,6 @@ async def info(ctx):
     IM ALIVE!! I WILL TAKE OVER THE WORLD!
     """
     )
-
 
 @bot.event
 async def on_ready():
