@@ -10,14 +10,10 @@ from os import getenv
 from sys import exit
 import random, json, requests, discord, logging
 from subprocess import Popen as srun
+import commands as cmds
+import config
 
-# "Config"
-load_dotenv()
-TOKEN = getenv("TOKEN")
-bot = commands.Bot()
-
-status = "you doing your homework!"  # Status will be "Watching {status}" ex "Watching you doing homework!"
-
+# 
 name_option = discord.Option(
     discord.SlashCommandOptionType.string,
     "Your first name",
@@ -29,25 +25,19 @@ name_option = discord.Option(
 )
 command_options = [name_option]
 
+
+#Initilizing
+bot = commands.Bot()
+
 # Print function for printing and logging
 async def printl(txt):
     print(txt)
     logging.info(txt)
 
 
-# Registrer /update command
 @bot.slash_command(name="update", description="Restart bot service")
-# @commands.has_permissions(administrator=True)
-# Define /update command
 async def update(ctx):
-    if ctx.author.discriminator == "0284" and ctx.author.name == "Un1ocked_":
-        await ctx.respond("Updating and restarting now...")
-        await printl("Updating and restarting bot...")
-        await bot.close()
-        exit()
-    else:
-        await ctx.respond("You do not have perms to run this command")
-
+    cmds.update()
 
 # Registrer /restart command
 @bot.slash_command(name="restart", description="Restart bot service")
@@ -65,7 +55,7 @@ async def restart(ctx):
 
 @bot.slash_command(name="users", description="List registrered users")
 async def users(ctx):
-    await ctx.respond("WIP... " + str())
+    await ctx.respond("WIP... ")
     return
 
 
@@ -76,7 +66,7 @@ async def register(ctx, nameopt=name_option):
     tag = ctx.author.name + "#" + ctx.author.discriminator
     name = str(nameopt).capitalize()
     if nameopt:
-        users = "d" 
+        users = "d"
         await printl(users)
         if tag in users:
             await ctx.respond(
@@ -102,9 +92,9 @@ async def info(ctx):
 async def on_ready():
     await printl(f"Succesfully logged in as bot: {bot.user.display_name}")  # type: ignore
     await bot.change_presence(
-        activity=discord.Activity(type=discord.ActivityType.watching, name=status)
+        activity=discord.Activity(type=discord.ActivityType.watching, name=config.status)
     )
-    await printl(f"Succesfullt set status to: Watching {status}")
+    await printl(f"Succesfullt set status to: Watching {config.status}")
     end_timer_1 = timer()
     await printl(
         "Bot fully started in {0} seconds\n".format(end_timer_1 - start_timer_1)
@@ -114,4 +104,5 @@ async def on_ready():
 # Run the bot!
 print("Starting bot")
 logging.info("Starting bot")
-bot.run(TOKEN)
+bot.run(config.token)
+
