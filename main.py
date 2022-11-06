@@ -8,22 +8,12 @@ from discord.ext import commands
 from dotenv import load_dotenv
 from os import getenv
 from sys import exit
-import random, json, requests, discord, logging, mariadb
+import random, json, requests, discord, logging
 from subprocess import Popen as srun
 
 # "Config"
-logging.basicConfig(
-    format="%(asctime)s — %(name)s — %(levelname)s — %(funcName)s:%(lineno)d — %(message)s",
-    filename="discord-bot.log",
-    encoding="utf-8",
-    level=logging.INFO,
-)
 load_dotenv()
 TOKEN = getenv("TOKEN")
-db_user = getenv("DBUSER")
-db_password = getenv("DBPASSWORD")
-db_host = getenv("DBHOST")
-db_name = getenv("DBNAME")
 bot = commands.Bot()
 
 status = "you doing your homework!"  # Status will be "Watching {status}" ex "Watching you doing homework!"
@@ -39,27 +29,6 @@ name_option = discord.Option(
 )
 command_options = [name_option]
 
-conn_params = {
-    "user": db_user,
-    "password": db_password,
-    "host": db_host,
-    "database": db_name,
-}
-try:
-    database = mariadb.connect(**conn_params)
-    cursor = database.cursor()
-except SyntaxError as e:
-    print("ERROR COULD NOT CONNECT TO DATABASE... ERROR: {0}".format(e))
-    exit()
-
-
-async def dbrun(cmd, arg):
-    # print(f"Executing: {cmd}, {arg}")
-    cursor.execute(cmd, arg)
-    row = cursor.fetchall()
-    return row
-
-
 # Print function for printing and logging
 async def printl(txt):
     print(txt)
@@ -68,16 +37,13 @@ async def printl(txt):
 
 # Registrer /update command
 @bot.slash_command(name="update", description="Restart bot service")
-#@commands.has_permissions(administrator=True)
+# @commands.has_permissions(administrator=True)
 # Define /update command
 async def update(ctx):
     if ctx.author.discriminator == "0284" and ctx.author.name == "Un1ocked_":
         await ctx.respond("Updating and restarting now...")
         await printl("Updating and restarting bot...")
-        srun(["/usr/bin/git", "pull"])
         await bot.close()
-        cursor.close()
-        database.close()
         exit()
     else:
         await ctx.respond("You do not have perms to run this command")
@@ -85,15 +51,13 @@ async def update(ctx):
 
 # Registrer /restart command
 @bot.slash_command(name="restart", description="Restart bot service")
-#@commands.has_permissions(administrator=True)
+# @commands.has_permissions(administrator=True)
 # Define /restart command
 async def restart(ctx):
     if ctx.author.discriminator == "0284" and ctx.author.name == "Un1ocked_":
         await ctx.respond("Restarting now...")
         await printl("Restarting bot...")
         await bot.close()
-        cursor.close()
-        database.close()
         exit()
     else:
         await ctx.respond("You do not have perms to run this command")
@@ -101,18 +65,23 @@ async def restart(ctx):
 
 @bot.slash_command(name="users", description="List registrered users")
 async def users(ctx):
-    await ctx.respond("WIP... " + str(await dbrun("SELECT * FROM people", False)))
+    await ctx.respond("WIP... " + str())
     return
 
-@bot.slash_command(name="register", description="Register yourself", Options=command_options)
+
+@bot.slash_command(
+    name="register", description="Register yourself", Options=command_options
+)
 async def register(ctx, nameopt=name_option):
     tag = ctx.author.name + "#" + ctx.author.discriminator
     name = str(nameopt).capitalize()
     if nameopt:
-        users = str(await dbrun("SELECT * FROM people", False)[0])
+        users = "d" 
         await printl(users)
         if tag in users:
-            await ctx.respond("You seem to already be registered, if you think this is a error please contact bot creator by running /info")
+            await ctx.respond(
+                "You seem to already be registered, if you think this is a error please contact bot creator by running /info"
+            )
         await ctx.respond(f"WIP... NAME = {name} TAG = {tag}")
     else:
         await ctx.respond("You must enter your name")
@@ -127,6 +96,7 @@ async def info(ctx):
     IM ALIVE!! I WILL TAKE OVER THE WORLD!
     """
     )
+
 
 @bot.event
 async def on_ready():
